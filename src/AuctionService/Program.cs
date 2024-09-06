@@ -31,6 +31,11 @@ builder.Services.AddMassTransit(x =>
     
     x.UsingRabbitMq((context, cfg) =>
     {
+        cfg.Host(builder.Configuration["RabbitMq:Host"], "/", h =>
+        {
+            h.Username(builder.Configuration.GetValue("RabbitMQ:Username", "guest")!);
+            h.Password(builder.Configuration.GetValue("RabbitMQ:Password", "guest")!);
+        });
         cfg.ConfigureEndpoints(context);
     });
 });
@@ -38,7 +43,7 @@ builder.Services.AddMassTransit(x =>
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = builder.Configuration["IdentitySearchUrl"];
+        options.Authority = builder.Configuration["IdentityServiceUrl"];
         options.RequireHttpsMetadata = false;
         options.TokenValidationParameters.ValidateAudience = false;
         options.TokenValidationParameters.NameClaimType = "username";
